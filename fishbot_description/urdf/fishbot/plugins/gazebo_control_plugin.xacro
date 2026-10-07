@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="gazebo_control_plugin"  params="left_joint right_joint">
+        <gazebo>
+
+            <plugin name='diff_drive' filename='libgazebo_ros_diff_drive.so'>
+
+                <!--ROS 通信配置-->
+                <ros>
+                    <namespace>/</namespace>
+                    <remapping>cmd_vel:=cmd_vel</remapping>     <!--重映射标签:把插件内部的话题 cmd_vel、odom 映射到标准话题名-->
+                    <remapping>odom:=odom</remapping>           <!--重映射话题名字,把默认的cmd_vel重映射为cmd_vel相当于没有映射-->
+                                                                <!-- 目的是有一天想改变订阅和发布话题的名字,如:cmd_vel:=其他话题名-->
+                                                                <!--左边 cmd_vel：插件内部代码里写死使用的话题名。-->
+                                                                <!--右边 其他话题名：实际对外发布/订阅的话题名，也就是外部节点真正要发指令的目标话题-->
+                </ros>
+
+                <update_rate>30</update_rate> <!--30 Hz 的更新频率-->
+
+                <!--wheels-->
+                <left_joint>${left_joint}</left_joint> <!--填上 URDF 里左右轮对应的 joint 名字,用于去控制关节-->
+                <right_joint>${right_joint}</right_joint>
+
+                <!--kinematics-->
+                <wheel_separation>0.12</wheel_separation>  <!-- 两轮间距 0.12 米 -->
+                <wheel_diameter>0.04</wheel_diameter>    <!-- 轮子直径 0.04 米 -->
+                <!--limits-->
+                <max_wheel_torque>20</max_wheel_torque>  <!-- 最大轮力矩 20 N·m -->
+                <max_wheel_acceleration>1.0</max_wheel_acceleration> <!-- 最大轮加速度 -->
+                <!--output-->
+                <publish_odom>true</publish_odom>  <!-- 发布 odom 话题 -->
+                <publish_odom_tf>true</publish_odom_tf>  <!-- 发布 odom→base_footprint 的 TF -->
+                <publish_wheel_tf>true</publish_wheel_tf>   <!-- 发布轮子的 TF -->
+
+                <odometry_frame>odom</odometry_frame>   <!-- 里程计坐标系 -->
+                <robot_base_frame>base_footprint</robot_base_frame>  <!-- 机器人基座坐标系 -->
+
+            </plugin>
+
+        </gazebo>
+    </xacro:macro>
+
+</robot>
